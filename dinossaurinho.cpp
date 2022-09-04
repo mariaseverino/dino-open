@@ -4,15 +4,23 @@
 #include <math.h>
 
 GLfloat chao = -1.0;
-GLfloat xDino = -10.0, yDino = chao + 0.3;
-GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
-GLfloat cenarioX = 0.0;
-GLfloat proxObstaculo;
-int indexProxObstaculo = 0;
+GLfloat xDino = -4.0, yDino = chao;
+GLfloat xCacto = xDino + 4.0, yCacto = chao;
+GLboolean iluminacaoAtivada = GL_FALSE;
 
-GLfloat posicoesObstaculos[100];
+// Luz Inicial
+GLfloat luzAmbiente[4]={0.2,0.2,0.2,0.2};
+GLfloat luzDifusa[4]={0.7,0.7,0.7,1.0}; // "cor"
+GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho" 
+GLfloat posicaoLuz[4]={0.0, 50.0, 50.0, 1.0};
 
-bool inicio = false;
+// Luz Vermelha
+GLfloat luzAmbienteVermelha[4] = {0.2,0.0,0.0,1.0};
+GLfloat luzDifusaVermelha[4] = {0.7,0.0,0.0,1.0}; // Cor da Luz
+
+// Capacidade de brilho do material
+GLfloat especularidade[4]={1.0,1.0,1.0,1.0}; 
+GLint especMaterial = 60;
 
 using namespace std;
 
@@ -215,15 +223,6 @@ void desenhaDino()
     glVertex2f(0.05, -0.3);
     glVertex2f(-0.05, -0.3);
     glEnd();
-
-    //----------------
-    glBegin(GL_QUADS);
-    glColor3f(1.0, 1.0, 0.0);
-    glVertex2f(0.05, 0.73);
-    glVertex2f(0.05, 0.68);
-    glVertex2f(0.1, 0.68);
-    glVertex2f(0.1, 0.73);
-    glEnd();
     glPopMatrix();
 }
 
@@ -231,8 +230,8 @@ void desenhaCacto()
 {
     glColor3f(0.0, 1.0, 0.0);
 
-    // glPushMatrix();
-    // glTranslatef(xCacto, yCacto, 0.0);
+    glPushMatrix();
+    glTranslatef(xCacto, yCacto, 0.0);
 
     glBegin(GL_POLYGON);
     glVertex2f(0.2, -0.3);
@@ -309,124 +308,78 @@ void desenhaCacto()
 
     glEnd();
 
-    // glPopMatrix();
-}
-
-void desenhaCaho()
-{
-    glColor3f(0.139, 0.0, 0.0);
-    glBegin(GL_QUADS);
-    glVertex2f(-20.0, chao);
-    glVertex2f(posicoesObstaculos[99] + 3.0, chao);
-
-    glVertex2f(posicoesObstaculos[99] + 3.0, chao - 6.0);
-    glVertex2f(-20.0, chao - 6.0);
-
-    glEnd();
-}
-
-void init()
-{
-    GLfloat posicaoAnterior = xDino + 4.0;
-
-    for (int i = 0; i < 100; i++)
-    {
-        posicoesObstaculos[i] = posicaoAnterior + 7.0;
-        posicaoAnterior = posicoesObstaculos[i];
-    }
-    cout << posicoesObstaculos[99] << endl;
-    cout << posicoesObstaculos[0] << endl;
-    proxObstaculo = posicoesObstaculos[0];
-}
-void cena()
-{
-    // glClearColor(0.0, 0.0, 0.0, 0.0);
-    glPushMatrix();
-    glTranslatef(cenarioX, 0.0, 0.0);
-    desenhaCaho();
-
-    for (int i = 0; i < 100; i++)
-    {
-        glPushMatrix();
-        glTranslatef(posicoesObstaculos[i], yCacto, 0.0);
-        desenhaCacto();
-        glPopMatrix();
-        // xCacto = xCacto + 7.0;
-    }
     glPopMatrix();
+}
+
+void AlterarLuz() {
+    if(iluminacaoAtivada){
+        iluminacaoAtivada = GL_FALSE;
+        glDisable(GL_LIGHT1);
+    } else {
+        iluminacaoAtivada = GL_TRUE;
+        glEnable(GL_LIGHT1);
+    }
 }
 void display()
 {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // GL_DEPTH_BUFFER_BIT valores de profundidade maiores possíveis
+    glShadeModel(GL_SMOOTH);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       // Define a refletância do material 
+	glMaterialfv(GL_FRONT,GL_SPECULAR, especularidade);
+	// Define a concentração do brilho
+	glMateriali(GL_FRONT,GL_SHININESS,especMaterial);
 
-    // desenhaCacto();
-    // glPushMatrix();
-    // glTranslatef(, 0.0, 0.0);
+	// Ativa o uso da luz ambiente 
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
-    cena();
+	// Define os parâmetros da luz de número 0
+	glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente); 
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular );
+	glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz );
+
+   	// Define os parâmetros da luz de número 1
+	glLightfv(GL_LIGHT1, GL_AMBIENT, luzAmbienteVermelha); 
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, luzDifusaVermelha);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, luzEspecular);
+	glLightfv(GL_LIGHT1, GL_POSITION, posicaoLuz);
+
+	// Habilita a definição da cor do material a partir da cor corrente
+	glEnable(GL_COLOR_MATERIAL);
+	//Habilita o uso de iluminação
+	glEnable(GL_LIGHTING);  
+	// Habilita a luz de número 0
+    //glEnable(GL_LIGHT0);
+	// Habilita o depth-buffering
+	glEnable(GL_DEPTH_TEST);
+
     desenhaDino();
-
-    // glPopMatrix();
+    desenhaCacto();
 
     glutSwapBuffers();
 }
 
 void timer(int value)
 {
-    if (yDino > chao + 0.3)
+    if (xCacto - 0.3 < floor(xDino))
+    {
+        cout << "colisao ";
+    }
+    else if (xDino < 4.0)
+    {
+        xDino = xDino + 0.1;
+        glutPostRedisplay();
+        glutTimerFunc(50, timer, 1);
+    }
+    else if (yDino > chao)
     {
         yDino = yDino - 0.1;
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
+        glutPostRedisplay();
+        glutTimerFunc(50, timer, 1);
     }
-    if (proxObstaculo < xDino and yDino <= yCacto)
-    {
-        cout << "colisao \n";
-        return;
-    }
-    else if (proxObstaculo < xDino and yDino > yCacto)
-    {
-        // cout << "colisao \n";
-        indexProxObstaculo++;
-        proxObstaculo = posicoesObstaculos[indexProxObstaculo];
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
-    }
-    else
-    {
-        if (inicio == true)
-        {
-            cenarioX = cenarioX - 0.10;
-            proxObstaculo = proxObstaculo - 0.10;
-        }
 
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
-    }
-    glutPostRedisplay();
-    glutTimerFunc(50, timer, 1);
-    // if (xCacto - 0.3 < floor(xDino) and (yDino > 0.75))
-    // {
-    //     cout << "colisao ";
-    // }
-    // else
-    // {
-    //     // if (xDino < 4.0)
-    //     // {
-    //     //     xDino = xDino + 0.1;
-    //     // }
-    //     if (yDino > chao)
-    //     {
-    //         yDino = yDino - 0.1;
-    //     }
-    //     glutPostRedisplay();
-    //     glutTimerFunc(50, timer, 1);
-    // }
-
-    // cout << xDino << " " << xCacto << " " << xCacto - 0.30 << endl;
-    // cout << inicio << endl;
+    cout << xDino << " " << xCacto << " " << xCacto - 0.30 << endl;
 }
 
 void reshape(int w, int h)
@@ -434,7 +387,7 @@ void reshape(int w, int h)
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(105.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
+    gluPerspective(65.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, -5.0);
@@ -444,18 +397,16 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-    case 'a':
-        inicio = true;
+    case 's':
+        yDino += 2.0;
         glutPostRedisplay();
-
-        break;
-    case 32:
-        yDino += 2.5;
-        glutPostRedisplay();
-
         break;
     case 27:
         exit(0);
+        break;
+    case 'l':
+        AlterarLuz();
+        glutPostRedisplay();
         break;
     default:
         break;
@@ -467,9 +418,8 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(1200, 720);
-    // glutInitWindowPosition(100, 100);
+    glutInitWindowPosition(100, 100);
     glutCreateWindow("dinossaurinho");
-    init();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);

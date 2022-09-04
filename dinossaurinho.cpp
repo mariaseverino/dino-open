@@ -489,6 +489,12 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'r':
+        chao = -0.3;
+        xDino = -10.0, yDino = chao + 0.3;
+        xCacto = xDino + 20.0, yCacto = chao + 0.3;
+        cenarioX = 0.0;
+        indexProxObstaculo = 0;
+
         inicio = true;
         glutPostRedisplay();
 

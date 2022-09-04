@@ -8,7 +8,7 @@ GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
 GLfloat cenarioX = 0.0;
 GLfloat proxObstaculo;
-GLboolean iluminacaoAtivada = GL_FALSE;
+//GLboolean iluminacaoAtivada = GL_FALSE;
 int indexProxObstaculo = 0;
 
 GLfloat posicoesObstaculos[100];
@@ -336,7 +336,15 @@ void desenhaChao()
     glEnd();
 }
 
-void AlterarLuz() {
+void AcenderLuz(){
+    glEnable(GL_LIGHT0);
+}
+
+void ApagarLuz(){
+    glDisable(GL_LIGHT0);
+}
+
+/*void AlterarLuz() {
     if(iluminacaoAtivada){
         iluminacaoAtivada = GL_FALSE;
         glDisable(GL_LIGHT0);
@@ -344,7 +352,7 @@ void AlterarLuz() {
         iluminacaoAtivada = GL_TRUE;
         glEnable(GL_LIGHT0);
     }
-}
+}*/
 
 
 void init()
@@ -472,9 +480,10 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
     case 'a':
-        inicio = true;
+        //inicio = true;
+        //glutPostRedisplay();
+        AcenderLuz();
         glutPostRedisplay();
-
         break;
     case 'r':
         inicio = true;
@@ -487,8 +496,8 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
 
         break;
-    case 'l':
-        AlterarLuz();
+    case 'd':
+        ApagarLuz();
         glutPostRedisplay();
         break;
     case 27:

@@ -500,9 +500,11 @@ void keyboard(unsigned char key, int x, int y)
 
         break;
     case 32:
-        yDino += 3.0;
-        glutPostRedisplay();
-
+        if(yDino <= chao + 0.3)
+        {
+            yDino += 3.0;
+            glutPostRedisplay();
+        }
         break;
     case 'd':
         ApagarLuz();

@@ -8,7 +8,7 @@ GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
 GLfloat cenarioX = 0.0;
 GLfloat proxObstaculo;
-//GLboolean iluminacaoAtivada = GL_FALSE;
+// GLboolean iluminacaoAtivada = GL_FALSE;
 int indexProxObstaculo = 0;
 
 GLfloat posicoesObstaculos[100];
@@ -16,19 +16,42 @@ GLfloat posicoesObstaculos[100];
 bool inicio = false;
 
 // Luzes
-GLfloat luzAmbiente[4]={0.2,0.0,0.0,0.2};
-GLfloat luzDifusa[4]={0.7,0.0,0.0,1.0}; // "cor"
-GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho" 
-GLfloat posicaoLuz[4]={0.0, 50.0, 50.0, 1.0};
+// GLfloat luzAmbiente[4] = {0.2, 0.0, 0.0, 0.2};
+GLfloat luzAmbiente[4] = {0.2, 0.2, 0.2, 1.0};
+// GLfloat luzDifusa[4] = {0.7, 0.0, 0.0, 1.0};    // "cor"
+GLfloat luzDifusa[4] = {0.7, 0.7, 0.7, 1.0};    // "cor"
+GLfloat luzEspecular[4] = {1.0, 1.0, 1.0, 1.0}; // "brilho"
+GLfloat posicaoLuz[4] = {0.0, 50.0, 50.0, 1.0};
 
 // Capacidade de brilho do material
-GLfloat especularidade[4]={1.0,1.0,1.0,1.0}; 
+GLfloat especularidade[4] = {1.0, 1.0, 1.0, 1.0};
 GLint especMaterial = 60;
 
 using namespace std;
 
 void desenhaDino()
 {
+    // glMaterialfv(GL_BACK, GL_SPECULAR, especularidade);
+    // // Define a concentração do brilho
+    // glMateriali(GL_BACK, GL_SHININESS, especMaterial);
+
+    // // Ativa o uso da luz ambiente
+    // glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
+
+    // // Define os parâmetros da luz de número 0
+    // glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
+    // // glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
+    // // glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
+    // glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
+
+    // Habilita a definição da cor do material a partir da cor corrente
+    // glEnable(GL_COLOR_MATERIAL);
+    // Habilita o uso de iluminação
+    // glEnable(GL_LIGHTING);
+    // Habilita a luz de número 0
+    // glEnable(GL_LIGHT0);
+    // Habilita o depth-buffering
+    // glEnable(GL_DEPTH_TEST);
     glColor3f(0.5, 0.5, 0.5);
 
     glPushMatrix();
@@ -330,17 +353,19 @@ void desenhaChao()
     glVertex2f(-20.0, chao);
     glVertex2f(posicoesObstaculos[99] + 3.0, chao);
 
-    glVertex2f(posicoesObstaculos[99] + 3.0, chao - 6.0);
-    glVertex2f(-20.0, chao - 6.0);
+    glVertex2f(posicoesObstaculos[99] + 3.0, chao - 7.0);
+    glVertex2f(-20.0, chao - 7.0);
 
     glEnd();
 }
 
-void AcenderLuz(){
+void AcenderLuz()
+{
     glEnable(GL_LIGHT0);
 }
 
-void ApagarLuz(){
+void ApagarLuz()
+{
     glDisable(GL_LIGHT0);
 }
 
@@ -354,12 +379,25 @@ void ApagarLuz(){
     }
 }*/
 
-
 void init()
 {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    // Habilita a definição da cor do material a partir da cor corrente
+    glEnable(GL_COLOR_MATERIAL);
+    // Habilita o uso de iluminação
+    glEnable(GL_LIGHTING);
+    // Habilita a luz de número 0
+    glEnable(GL_LIGHT0);
+    // Habilita o depth-buffering
+    glEnable(GL_DEPTH_TEST);
+    // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    // Define a refletância do material
+    glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade);
+    // // Define a concentração do brilho
+    glMateriali(GL_FRONT, GL_SHININESS, especMaterial);
+    glEnable(GL_DEPTH_TEST);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glShadeModel(GL_FLAT);
 
     GLfloat posicaoAnterior = xDino + 4.0;
 
@@ -395,30 +433,16 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glShadeModel(GL_SMOOTH);
+    // glShadeModel(GL_SMOOTH);
 
-    // Define a refletância do material 
-	glMaterialfv(GL_FRONT,GL_SPECULAR, especularidade);
-	// Define a concentração do brilho
-	glMateriali(GL_FRONT,GL_SHININESS,especMaterial);
+    // // Ativa o uso da luz ambiente
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
-	// Ativa o uso da luz ambiente 
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
-
-	// Define os parâmetros da luz de número 0
-	glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente); 
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular );
-	glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz );
-
-	// Habilita a definição da cor do material a partir da cor corrente
-	glEnable(GL_COLOR_MATERIAL);
-	//Habilita o uso de iluminação
-	glEnable(GL_LIGHTING);  
-	// Habilita a luz de número 0
-    //glEnable(GL_LIGHT0);
-	// Habilita o depth-buffering
-	glEnable(GL_DEPTH_TEST);
+    // // Define os parâmetros da luz de número 0
+    glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
+    glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
 
     cena();
     desenhaDino();
@@ -480,14 +504,13 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
     case 'a':
-        //inicio = true;
-        //glutPostRedisplay();
+        // inicio = true;
+        // glutPostRedisplay();
         AcenderLuz();
         glutPostRedisplay();
         break;
     case 'r':
         inicio = true;
-        init();
         glutPostRedisplay();
 
         break;

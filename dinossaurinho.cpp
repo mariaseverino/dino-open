@@ -3,7 +3,7 @@
 #include <iostream>
 #include <math.h>
 
-GLfloat chao = -1.0;
+GLfloat chao = -0.3;
 GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
 GLfloat cenarioX = 0.0;
@@ -312,7 +312,7 @@ void desenhaCacto()
     // glPopMatrix();
 }
 
-void desenhaCaho()
+void desenhaChao()
 {
     glColor3f(0.139, 0.0, 0.0);
     glBegin(GL_QUADS);
@@ -327,23 +327,30 @@ void desenhaCaho()
 
 void init()
 {
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     GLfloat posicaoAnterior = xDino + 4.0;
 
     for (int i = 0; i < 100; i++)
     {
-        posicoesObstaculos[i] = posicaoAnterior + 7.0;
+        posicoesObstaculos[i] = posicaoAnterior + 16.0;
         posicaoAnterior = posicoesObstaculos[i];
     }
-    cout << posicoesObstaculos[99] << endl;
-    cout << posicoesObstaculos[0] << endl;
     proxObstaculo = posicoesObstaculos[0];
+
+    for (int i = 0; i < 100; i++)
+    {
+        cout << posicoesObstaculos[i] << " ";
+    }
+    cout << endl;
 }
 void cena()
 {
-    // glClearColor(0.0, 0.0, 0.0, 0.0);
     glPushMatrix();
     glTranslatef(cenarioX, 0.0, 0.0);
-    desenhaCaho();
+    desenhaChao();
 
     for (int i = 0; i < 100; i++)
     {
@@ -351,82 +358,55 @@ void cena()
         glTranslatef(posicoesObstaculos[i], yCacto, 0.0);
         desenhaCacto();
         glPopMatrix();
-        // xCacto = xCacto + 7.0;
     }
     glPopMatrix();
 }
 void display()
 {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // desenhaCacto();
-    // glPushMatrix();
-    // glTranslatef(, 0.0, 0.0);
 
     cena();
     desenhaDino();
 
-    // glPopMatrix();
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex2f(9.0, 0.0);
+    glVertex2f(-10.0, 0.0);
+    glVertex2f((-10.0) + (15.0), 0.0);
+    glEnd();
 
     glutSwapBuffers();
 }
 
 void timer(int value)
 {
-    if (yDino > chao + 0.3)
+    if (inicio == true)
     {
-        yDino = yDino - 0.1;
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
-    }
-    if (proxObstaculo < xDino and yDino <= yCacto)
-    {
-        cout << "colisao \n";
-        return;
-    }
-    else if (proxObstaculo < xDino and yDino > yCacto)
-    {
-        // cout << "colisao \n";
-        indexProxObstaculo++;
-        proxObstaculo = posicoesObstaculos[indexProxObstaculo];
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
-    }
-    else
-    {
-        if (inicio == true)
+        cenarioX = cenarioX - 0.4;
+        proxObstaculo = proxObstaculo - 0.4;
+
+        if (yDino > chao + 0.3)
         {
-            cenarioX = cenarioX - 0.10;
-            proxObstaculo = proxObstaculo - 0.10;
+            yDino = yDino - 0.2;
         }
 
-        // glutPostRedisplay();
-        // glutTimerFunc(50, timer, 1);
+        if (proxObstaculo <= -10.0 and yDino <= chao + 0.3)
+        {
+            cout << "colisao \n";
+            cout << proxObstaculo << endl;
+
+            inicio = false;
+        }
+        else if (proxObstaculo <= -10.0 and yDino > chao + 0.3)
+        {
+            proxObstaculo = 6.0;
+            cout << " pulou \n";
+        }
     }
+
     glutPostRedisplay();
     glutTimerFunc(50, timer, 1);
-    // if (xCacto - 0.3 < floor(xDino) and (yDino > 0.75))
-    // {
-    //     cout << "colisao ";
-    // }
-    // else
-    // {
-    //     // if (xDino < 4.0)
-    //     // {
-    //     //     xDino = xDino + 0.1;
-    //     // }
-    //     if (yDino > chao)
-    //     {
-    //         yDino = yDino - 0.1;
-    //     }
-    //     glutPostRedisplay();
-    //     glutTimerFunc(50, timer, 1);
-    // }
-
-    // cout << xDino << " " << xCacto << " " << xCacto - 0.30 << endl;
-    // cout << inicio << endl;
 }
 
 void reshape(int w, int h)
@@ -449,8 +429,14 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
 
         break;
+    case 'r':
+        inicio = true;
+        init();
+        glutPostRedisplay();
+
+        break;
     case 32:
-        yDino += 2.5;
+        yDino += 3.0;
         glutPostRedisplay();
 
         break;
@@ -467,7 +453,6 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(1200, 720);
-    // glutInitWindowPosition(100, 100);
     glutCreateWindow("dinossaurinho");
     init();
     glutDisplayFunc(display);

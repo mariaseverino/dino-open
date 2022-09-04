@@ -8,11 +8,22 @@ GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
 GLfloat cenarioX = 0.0;
 GLfloat proxObstaculo;
+GLboolean iluminacaoAtivada = GL_FALSE;
 int indexProxObstaculo = 0;
 
 GLfloat posicoesObstaculos[100];
 
 bool inicio = false;
+
+// Luzes
+GLfloat luzAmbiente[4]={0.2,0.0,0.0,0.2};
+GLfloat luzDifusa[4]={0.7,0.0,0.0,1.0}; // "cor"
+GLfloat luzEspecular[4]={1.0, 1.0, 1.0, 1.0};// "brilho" 
+GLfloat posicaoLuz[4]={0.0, 50.0, 50.0, 1.0};
+
+// Capacidade de brilho do material
+GLfloat especularidade[4]={1.0,1.0,1.0,1.0}; 
+GLint especMaterial = 60;
 
 using namespace std;
 
@@ -325,6 +336,17 @@ void desenhaChao()
     glEnd();
 }
 
+void AlterarLuz() {
+    if(iluminacaoAtivada){
+        iluminacaoAtivada = GL_FALSE;
+        glDisable(GL_LIGHT0);
+    } else {
+        iluminacaoAtivada = GL_TRUE;
+        glEnable(GL_LIGHT0);
+    }
+}
+
+
 void init()
 {
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -364,6 +386,31 @@ void cena()
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glShadeModel(GL_SMOOTH);
+
+    // Define a refletância do material 
+	glMaterialfv(GL_FRONT,GL_SPECULAR, especularidade);
+	// Define a concentração do brilho
+	glMateriali(GL_FRONT,GL_SHININESS,especMaterial);
+
+	// Ativa o uso da luz ambiente 
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
+
+	// Define os parâmetros da luz de número 0
+	glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente); 
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular );
+	glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz );
+
+	// Habilita a definição da cor do material a partir da cor corrente
+	glEnable(GL_COLOR_MATERIAL);
+	//Habilita o uso de iluminação
+	glEnable(GL_LIGHTING);  
+	// Habilita a luz de número 0
+    //glEnable(GL_LIGHT0);
+	// Habilita o depth-buffering
+	glEnable(GL_DEPTH_TEST);
 
     cena();
     desenhaDino();
@@ -439,6 +486,10 @@ void keyboard(unsigned char key, int x, int y)
         yDino += 3.0;
         glutPostRedisplay();
 
+        break;
+    case 'l':
+        AlterarLuz();
+        glutPostRedisplay();
         break;
     case 27:
         exit(0);

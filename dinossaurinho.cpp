@@ -31,27 +31,6 @@ using namespace std;
 
 void desenhaDino()
 {
-    // glMaterialfv(GL_BACK, GL_SPECULAR, especularidade);
-    // // Define a concentração do brilho
-    // glMateriali(GL_BACK, GL_SHININESS, especMaterial);
-
-    // // Ativa o uso da luz ambiente
-    // glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
-
-    // // Define os parâmetros da luz de número 0
-    // glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
-    // // glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
-    // // glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
-    // glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
-
-    // Habilita a definição da cor do material a partir da cor corrente
-    // glEnable(GL_COLOR_MATERIAL);
-    // Habilita o uso de iluminação
-    // glEnable(GL_LIGHTING);
-    // Habilita a luz de número 0
-    // glEnable(GL_LIGHT0);
-    // Habilita o depth-buffering
-    // glEnable(GL_DEPTH_TEST);
     glColor3f(0.5, 0.5, 0.5);
 
     glPushMatrix();
@@ -503,7 +482,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-    case 'a':
+    case 'l':
         // inicio = true;
         // glutPostRedisplay();
         AcenderLuz();

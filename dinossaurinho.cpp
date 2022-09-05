@@ -3,6 +3,31 @@
 #include <iostream>
 #include <math.h>
 
+#define checkImageWidth 64
+#define checkImageHeight 64
+static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
+
+#ifdef GL_VERSION_1_1
+static GLuint texName;
+#endif
+
+void textura()
+{
+    int i, j, c;
+
+    for (i = 0; i < checkImageHeight; i++)
+    {
+        for (j = 0; j < checkImageWidth; j++)
+        {
+            c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 250;
+            checkImage[i][j][0] = (GLubyte)c;
+            checkImage[i][j][1] = (GLubyte)25;
+            checkImage[i][j][2] = (GLubyte)c;
+            checkImage[i][j][3] = (GLubyte)25;
+        }
+    }
+}
+
 GLfloat chao = -0.3;
 GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
@@ -10,10 +35,7 @@ GLfloat cenarioX = 0.0;
 GLfloat proxObstaculo;
 GLfloat p1 = 0.1, p2 = 0.0;
 GLfloat pc1 = 0.0, pc2 = 0.0;
-// GLboolean iluminacaoAtivada = GL_FALSE;
 
-int cont1 = 0;
-int cont2 = 100;
 int indexProxObstaculo = 0;
 
 GLfloat posicoesObstaculos[100];
@@ -21,9 +43,7 @@ GLfloat posicoesObstaculos[100];
 bool inicio = false;
 
 // Luzes
-// GLfloat luzAmbiente[4] = {0.2, 0.0, 0.0, 0.2};
 GLfloat luzAmbiente[4] = {0.2, 0.2, 0.2, 1.0};
-// GLfloat luzDifusa[4] = {0.7, 0.0, 0.0, 1.0};    // "cor"
 GLfloat luzDifusa[4] = {0.7, 0.7, 0.7, 1.0};    // "cor"
 GLfloat luzEspecular[4] = {1.0, 1.0, 1.0, 1.0}; // "brilho"
 GLfloat posicaoLuz[4] = {0.0, 50.0, 50.0, 1.0};
@@ -36,7 +56,8 @@ using namespace std;
 
 void desenhaDino()
 {
-    glColor3f(0.5, 0.5, 0.5);
+    // glColor3f(0.71, 0.74, 0.81);
+    glColor3f(0.071, 0.074, 0.081);
 
     glPushMatrix();
     glTranslatef(xDino, yDino, 0.0);
@@ -261,10 +282,7 @@ void desenhaDino()
 
 void desenhaCacto()
 {
-    glColor3f(0.0, 1.0, 0.0);
-
-    // glPushMatrix();
-    // glTranslatef(xCacto, yCacto, 0.0);
+    glColor3f(0.2, 1.0, 0.2);
 
     glBegin(GL_POLYGON);
     glVertex2f(0.2, -0.3);
@@ -340,18 +358,29 @@ void desenhaCacto()
     glVertex2f(0.33, 0.58);
 
     glEnd();
-
-    // glPopMatrix();
 }
 
 void desenhaChao()
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+#ifdef GL_VERSION_1_1
+    glBindTexture(GL_TEXTURE_2D, texName);
+#endif
+
     glColor3f(0.139, 0.0, 0.0);
     glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
     glVertex2f(-20.0, chao);
+
+    glTexCoord2f(0.0, 1.0);
     glVertex2f(posicoesObstaculos[99] + 3.0, chao);
 
+    glTexCoord2f(1.0, 1.0);
     glVertex2f(posicoesObstaculos[99] + 3.0, chao - 7.0);
+
+    glTexCoord2f(1.0, 0.0);
     glVertex2f(-20.0, chao - 7.0);
 
     glEnd();
@@ -367,19 +396,34 @@ void ApagarLuz()
     glDisable(GL_LIGHT0);
 }
 
-/*void AlterarLuz() {
-    if(iluminacaoAtivada){
-        iluminacaoAtivada = GL_FALSE;
-        glDisable(GL_LIGHT0);
-    } else {
-        iluminacaoAtivada = GL_TRUE;
-        glEnable(GL_LIGHT0);
-    }
-}*/
+void constroiTextura()
+{
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
 
+    textura();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+#ifdef GL_VERSION_1_1
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
+#endif
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+#ifdef GL_VERSION_1_1
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#else
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, checkImageWidth, checkImageHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#endif
+}
 void init()
 {
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(0.71, 0.74, 0.81, 0.0);
     // Habilita a definição da cor do material a partir da cor corrente
     glEnable(GL_COLOR_MATERIAL);
     // Habilita o uso de iluminação
@@ -405,12 +449,6 @@ void init()
         posicaoAnterior = posicoesObstaculos[i];
     }
     proxObstaculo = posicoesObstaculos[0];
-
-    for (int i = 0; i < 100; i++)
-    {
-        cout << posicoesObstaculos[i] << " ";
-    }
-    cout << endl;
 }
 void cena()
 {
@@ -431,9 +469,6 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // glShadeModel(GL_SMOOTH);
-
-    // // Ativa o uso da luz ambiente
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
     // // Define os parâmetros da luz de número 0
@@ -462,26 +497,20 @@ void timer(int value)
     {
         if (p2 < 0.005)
         {
-            cout << "m" << endl;
             p2 = 0.0;
         }
 
         p1 = p1 - 0.005;
         p2 = p2 + 0.005;
-
-        cout << p1 << " / " << p2 << endl;
     }
     else if (p2 > pc2)
     {
         if (p1 < 0.005)
         {
-            cout << "m" << endl;
             p1 = 0.0;
         }
         p1 = p1 + 0.005;
         p2 = p2 - 0.005;
-
-        cout << p1 << " * " << (p2 * 100) / 100 << endl;
     }
 
     if (inicio == true)
@@ -497,14 +526,12 @@ void timer(int value)
         if (proxObstaculo <= -10.0 and yDino <= chao + 0.3)
         {
             cout << "colisao \n";
-            cout << proxObstaculo << endl;
 
             inicio = false;
         }
         else if (proxObstaculo <= -10.0 and yDino > chao + 0.3)
         {
             proxObstaculo = 6.0;
-            cout << " pulou \n";
         }
     }
 
@@ -528,8 +555,6 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
     case 'a':
-        // inicio = true;
-        // glutPostRedisplay();
         AcenderLuz();
         glutPostRedisplay();
         break;
@@ -568,8 +593,9 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(1200, 720);
-    glutCreateWindow("dinossaurinho");
+    glutCreateWindow("Dino Open");
     init();
+    constroiTextura();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);

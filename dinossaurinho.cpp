@@ -555,19 +555,6 @@ void keyboard(unsigned char key, int x, int y)
     case 'a':
         AcenderLuz();
         glutPostRedisplay();
-
-        break;
-    case 'r':
-        chao = -0.3;
-        xDino = -10.0, yDino = chao + 0.3;
-        xCacto = xDino + 20.0, yCacto = chao + 0.3;
-        cenarioX = 0.0;
-        indexProxObstaculo = 0;
-
-        inicio = true;
-        init();
-        glutPostRedisplay();
-
         break;
     case 32:
         if (yDino <= chao + 0.3)
@@ -589,6 +576,21 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        chao = -0.3;
+        xDino = -10.0, yDino = chao + 0.3;
+        xCacto = xDino + 20.0, yCacto = chao + 0.3;
+        cenarioX = 0.0;
+        indexProxObstaculo = 0;
+
+        inicio = true;
+        init();
+    }
+}
+
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
@@ -600,6 +602,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
     glutTimerFunc(50, timer, 1);
     glutMainLoop();
     return 0;

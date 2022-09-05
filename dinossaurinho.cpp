@@ -8,7 +8,12 @@ GLfloat xDino = -10.0, yDino = chao + 0.3;
 GLfloat xCacto = xDino + 20.0, yCacto = chao + 0.3;
 GLfloat cenarioX = 0.0;
 GLfloat proxObstaculo;
+GLfloat p1 = 0.1, p2 = 0.0;
+GLfloat pc1 = 0.0, pc2 = 0.0;
 // GLboolean iluminacaoAtivada = GL_FALSE;
+
+int cont1 = 0;
+int cont2 = 100;
 int indexProxObstaculo = 0;
 
 GLfloat posicoesObstaculos[100];
@@ -116,7 +121,7 @@ void desenhaDino()
     glVertex2f(-0.1, -0.15);
     glVertex2f(0.0, -0.15);
     glEnd();
-    //-------------------
+    // //-- -- -- -- -- -- -- -- -- -
     glBegin(GL_POLYGON);
     glVertex2f(-0.15, 0.35);
     glVertex2f(-0.1, 0.35);
@@ -124,23 +129,23 @@ void desenhaDino()
     glVertex2f(-0.1, -0.1);
     glVertex2f(-0.15, -0.1);
     glEnd();
-    //-------------------
+    // //-- -- -- -- -- -- -- -- -- -
     glBegin(GL_POLYGON);
     glVertex2f(-0.25, 0.3);
     glVertex2f(-0.15, 0.3);
 
-    glVertex2f(-0.15, -0.15);
-    glVertex2f(-0.25, -0.15);
+    glVertex2f(-0.15, -0.1);
+    glVertex2f(-0.25, -0.1);
     glEnd();
-    //-------------------
+    // //-- -- -- -- -- -- -- -- -- -
     glBegin(GL_POLYGON);
     glVertex2f(-0.3, 0.25);
     glVertex2f(-0.25, 0.25);
 
-    glVertex2f(-0.25, -0.15);
-    glVertex2f(-0.3, -0.15);
+    glVertex2f(-0.25, -0.1);
+    glVertex2f(-0.3, -0.1);
     glEnd();
-    //-------------------
+    //-- -- -- -- -- -- -- -- -- -? ? ? ? ? ? ?
     glBegin(GL_POLYGON);
     glVertex2f(-0.3, 0.2);
     glVertex2f(-0.35, 0.2);
@@ -148,15 +153,7 @@ void desenhaDino()
     glVertex2f(-0.35, -0.1);
     glVertex2f(-0.3, -0.1);
     glEnd();
-    //-------------------
-    glBegin(GL_POLYGON);
-    glVertex2f(-0.3, 0.2);
-    glVertex2f(-0.35, 0.2);
-
-    glVertex2f(-0.35, -0.1);
-    glVertex2f(-0.3, -0.1);
-    glEnd();
-    //-------------------
+    //-- -- -- -- -- -- -- -- -- -
     glBegin(GL_POLYGON);
     glVertex2f(-0.35, 0.2);
     glVertex2f(-0.4, 0.2);
@@ -188,7 +185,25 @@ void desenhaDino()
     glVertex2f(-0.55, 0.1);
     glVertex2f(-0.5, 0.1);
     glEnd();
-    //-------------------
+    //--------perna1-----------
+    //------------------- isso aqui
+    glPushMatrix();
+    glTranslatef(0.0, p1, 0.0);
+    // glBegin(GL_POLYGON);
+    // glVertex2f(-0.3, 0.2);
+    // glVertex2f(-0.35, 0.2);
+
+    // glVertex2f(-0.35, -0.1);
+    // glVertex2f(-0.3, -0.1);
+    // glEnd();
+    glBegin(GL_POLYGON);
+    glVertex2f(-0.15, -0.1);
+    glVertex2f(-0.3, -0.1);
+
+    glVertex2f(-0.3, -0.15);
+    glVertex2f(-0.15, -0.15);
+    glEnd();
+
     glBegin(GL_POLYGON);
     glVertex2f(-0.2, -0.15);
     glVertex2f(-0.3, -0.15);
@@ -212,7 +227,10 @@ void desenhaDino()
     glVertex2f(-0.2, -0.3);
     glVertex2f(-0.25, -0.3);
     glEnd();
-    //-------------------
+    glPopMatrix();
+    //---------perna2----------
+    glPushMatrix();
+    glTranslatef(0.0, p2, 0.0);
     glBegin(GL_POLYGON);
     glVertex2f(-0.05, -0.15);
     glVertex2f(0.0, -0.15);
@@ -228,6 +246,7 @@ void desenhaDino()
     glVertex2f(0.05, -0.3);
     glVertex2f(-0.05, -0.3);
     glEnd();
+    glPopMatrix();
 
     //----------------
     glBegin(GL_QUADS);
@@ -439,6 +458,32 @@ void display()
 
 void timer(int value)
 {
+    if (p1 > pc1)
+    {
+        if (p2 < 0.005)
+        {
+            cout << "m" << endl;
+            p2 = 0.0;
+        }
+
+        p1 = p1 - 0.005;
+        p2 = p2 + 0.005;
+
+        cout << p1 << " / " << p2 << endl;
+    }
+    else if (p2 > pc2)
+    {
+        if (p1 < 0.005)
+        {
+            cout << "m" << endl;
+            p1 = 0.0;
+        }
+        p1 = p1 + 0.005;
+        p2 = p2 - 0.005;
+
+        cout << p1 << " * " << (p2 * 100) / 100 << endl;
+    }
+
     if (inicio == true)
     {
         cenarioX = cenarioX - 0.4;
@@ -482,7 +527,7 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-    case 'l':
+    case 'a':
         // inicio = true;
         // glutPostRedisplay();
         AcenderLuz();
@@ -500,7 +545,7 @@ void keyboard(unsigned char key, int x, int y)
 
         break;
     case 32:
-        if(yDino <= chao + 0.3)
+        if (yDino <= chao + 0.3)
         {
             yDino += 3.0;
             glutPostRedisplay();

@@ -396,34 +396,11 @@ void ApagarLuz()
     glDisable(GL_LIGHT0);
 }
 
-void constroiTextura()
-{
-    glShadeModel(GL_FLAT);
-    glEnable(GL_DEPTH_TEST);
-
-    textura();
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-#ifdef GL_VERSION_1_1
-    glGenTextures(1, &texName);
-    glBindTexture(GL_TEXTURE_2D, texName);
-#endif
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-#ifdef GL_VERSION_1_1
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
-#else
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, checkImageWidth, checkImageHeight,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
-#endif
-}
 void init()
 {
     glClearColor(0.71, 0.74, 0.81, 0.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Habilita a definição da cor do material a partir da cor corrente
     glEnable(GL_COLOR_MATERIAL);
     // Habilita o uso de iluminação
@@ -450,6 +427,33 @@ void init()
     }
     proxObstaculo = posicoesObstaculos[0];
 }
+
+void constroiTextura()
+{
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
+
+    textura();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+#ifdef GL_VERSION_1_1
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
+#endif
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+#ifdef GL_VERSION_1_1
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#else
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, checkImageWidth, checkImageHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
+#endif
+}
+
 void cena()
 {
     glPushMatrix();
@@ -480,41 +484,33 @@ void display()
     cena();
     desenhaDino();
 
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex2f(9.0, 0.0);
-    glVertex2f(-10.0, 0.0);
-    glVertex2f((-10.0) + (15.0), 0.0);
-    glEnd();
-
     glutSwapBuffers();
 }
 
 void timer(int value)
 {
-    if (p1 > pc1)
-    {
-        if (p2 < 0.005)
-        {
-            p2 = 0.0;
-        }
-
-        p1 = p1 - 0.005;
-        p2 = p2 + 0.005;
-    }
-    else if (p2 > pc2)
-    {
-        if (p1 < 0.005)
-        {
-            p1 = 0.0;
-        }
-        p1 = p1 + 0.005;
-        p2 = p2 - 0.005;
-    }
-
     if (inicio == true)
     {
+        if (p1 > pc1)
+        {
+            if (p2 < 0.005)
+            {
+                p2 = 0.0;
+            }
+
+            p1 = p1 - 0.005;
+            p2 = p2 + 0.005;
+        }
+        else if (p2 > pc2)
+        {
+            if (p1 < 0.005)
+            {
+                p1 = 0.0;
+            }
+            p1 = p1 + 0.005;
+            p2 = p2 - 0.005;
+        }
+
         cenarioX = cenarioX - 0.4;
         proxObstaculo = proxObstaculo - 0.4;
 
@@ -526,12 +522,14 @@ void timer(int value)
         if (proxObstaculo <= -10.0 and yDino <= chao + 0.3)
         {
             cout << "colisao \n";
+            cout << proxObstaculo << endl;
 
             inicio = false;
         }
         else if (proxObstaculo <= -10.0 and yDino > chao + 0.3)
         {
             proxObstaculo = 6.0;
+            cout << " pulou \n";
         }
     }
 
@@ -557,6 +555,7 @@ void keyboard(unsigned char key, int x, int y)
     case 'a':
         AcenderLuz();
         glutPostRedisplay();
+
         break;
     case 'r':
         chao = -0.3;
@@ -566,6 +565,7 @@ void keyboard(unsigned char key, int x, int y)
         indexProxObstaculo = 0;
 
         inicio = true;
+        init();
         glutPostRedisplay();
 
         break;
@@ -576,6 +576,7 @@ void keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
         }
         break;
+
     case 'd':
         ApagarLuz();
         glutPostRedisplay();
@@ -593,7 +594,7 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(1200, 720);
-    glutCreateWindow("Dino Open");
+    glutCreateWindow("dinossaurinho");
     init();
     constroiTextura();
     glutDisplayFunc(display);

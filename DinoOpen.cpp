@@ -1,12 +1,12 @@
-/* Autores: Gabriel Martins Silva, Gabriela Silva Memento, Maria Rita de Souza Severino
- * Disciplina: Computacao Grafica
- * O codigo abaixo foi desenvolvido para como trabalho de final da diciplina
+/* Autores: Gabriel Martins Silva,
+ *          Gabriela Silva Memento,
+ *          Maria Rita de Souza Severino
+ *
+ * O codigo abaixo foi desenvolvido como trabalho de final da diciplina de Computação Grafica
  */
 
 #include <GL/glut.h>
-#include <stdlib.h>
 #include <iostream>
-#include <math.h>
 
 #define checkImageWidth 64
 #define checkImageHeight 64
